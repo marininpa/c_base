@@ -5,9 +5,8 @@ int main(void)
 int var_a = 0;
 int var_b = 0;
 int var_c = 0;
-bool flag = true;
+bool flag = false;
 
-flag = false;
 scanf("%d", &var_a);
 
 while(var_a != 0)
