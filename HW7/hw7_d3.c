@@ -6,7 +6,7 @@ int main(void)
 {
 int l_num = 0;
 scanf("%d", &l_num);
-l_num == 0; printf("%d",l_num);print_num(l_num);
+l_num == 0 ? printf("%d\n",l_num) : print_num(l_num);
 return 0;
 }
 
