@@ -4,7 +4,8 @@ int in_arr(int *arr);
 int f_min_arr(int *arr, int *arr_min_pos);
 int f_max_arr(int *arr, int *arr_max_pos);
 
-enum {arr_size = 9};
+enum {arr_size = 10};
+
 
 int main(void)
 {
@@ -24,7 +25,7 @@ int main(void)
 int in_arr(int *arr)
 {
   int i;
-  for(i=0;i<=arr_size;i++)
+  for(i=0;i<arr_size;i++)
     scanf("%d", &arr[i]);
   return 0;
 }
@@ -35,7 +36,7 @@ int f_min_arr(int *arr, int *arr_min_pos)
   int i = 0;
   int min = arr[i];
   *arr_min_pos = 1;
-  for(i=0;i<=arr_size-1;i++)
+  for(i=0;i<arr_size-1;i++)
   {
     if (min > arr[i+1])
     {
@@ -52,7 +53,7 @@ int f_max_arr(int *arr, int *arr_max_pos)
   int i = 0;
   int max = arr[i];
   *arr_max_pos = 1;
-  for(i=0;i<=arr_size-1;i++)
+  for(i=0;i<arr_size-1;i++)
   {
     if (max < arr[i+1])
     {
