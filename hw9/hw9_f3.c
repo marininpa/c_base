@@ -17,7 +17,7 @@ int main(void)
 
 int print_arr(char *arr)
 {
-  int digits[9] = {};
+  int digits[10] = {};
   int i = 0;
   int dig = 0;
   for (i=0; arr[i]!= '\0';i++)
@@ -25,7 +25,7 @@ int print_arr(char *arr)
   dig = arr[i] - '0';
   digits[dig]++;
   }
-  i =0;
+  i = 0;
   for (i;i<10;i++)
   {
     if (digits[i] != 0)
