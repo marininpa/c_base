@@ -6,6 +6,7 @@ void print_arr (int size, int a[]);
 
 enum {arr_size = 10};
 
+
 int main(void)
 {
   int arr[arr_size] = {};
@@ -20,7 +21,7 @@ int in_arr(int *arr)
 {
   int i;
   for(i=0;i<arr_size;i++)
-    scanf("%d", &arr[i]);
+  scanf("%d", &arr[i]);
   return 0;
 }
 
@@ -34,21 +35,45 @@ void print_arr (int size, int a[])
 void sort_even_odd(int n, int a[])
 {
  int tmp_arr[2][n];
- int left =0;
- int right = n-1;
+ int odd_count =0;
+ int even_count =0;
  int i = 0;
- while (i < n-1) 
- {
-   while ((left < right) && (a[left] % 2 ==0)) 
-   {
-     left++;
-   }
-   while ((left < right) && (a[right] % 2 !=0)) 
-   {
-     right--;
-   }
-   tmp_arr[1][i] = a[left];
-   tmp_arr[2][i] = a[right];
+ int k = 0;
 
- }
+ for (i = 0;i < n;i++)
+  {
+    if ((a[i] == 0))
+      {
+        tmp_arr[0][odd_count] = a[i];
+        odd_count++;
+      }
+    else if (a[i] % 2 == 0) 
+      {
+        tmp_arr[0][odd_count] = a[i];
+        odd_count++;
+      }
+    else
+      {
+        tmp_arr[1][even_count] = a[i];
+        even_count++;
+
+      }
+
+  }
+  i = 0;
+  while (odd_count > 0)
+  {
+    a[i] = tmp_arr[0][i];
+    i++;
+    odd_count--;
+  }
+
+  while (even_count > 0)
+  {
+    a[i] = tmp_arr[1][k];
+    i++;
+    k++;
+    even_count--;
+  }
+  
 }
