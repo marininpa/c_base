@@ -10,8 +10,7 @@ int main(void)
   int n =0;  
   int arr[arr_size] = {};
   arr_count = in_arr(arr);
-  find_max_array(arr_count, arr);
-
+  printf("%d", find_max_array(arr_count, arr));
   return 0;
 }
 
@@ -25,8 +24,8 @@ int find_max_array(int size, int a[])
     {
       max = a[i+1];
     }
-  }   
-  printf("%d\n",max);
+  }
+return max;   
 }
  
 int in_arr(int *arr)
@@ -41,4 +40,3 @@ int in_arr(int *arr)
   }
   return l_count;
 }
-
