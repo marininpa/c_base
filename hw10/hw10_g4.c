@@ -33,13 +33,22 @@ if((fscanf(f_in, "%s %s", file_string1, file_string2))!=2)
  }
 
  // помечаем все символы в первом слове
+ int s=0;
  for (int i=0;file_string1[i];i++)
  {
-  check_s[file_string1[i]] = 1;
+  s = check_s[file_string1[i]] + 1;
+  if (s<2)
+  {
+    check_s[file_string1[i]] = s;
+  }
+  else 
+  {
+    check_s[file_string1[i]] = 100;
+  }
  }
 
 // сравниваем с символами второго слова
-int s=0;
+s=0;
 for (int i=0;file_string2[i];i++)
 {
   s = check_s[file_string2[i]] + 1;
@@ -49,10 +58,9 @@ for (int i=0;file_string2[i];i++)
 // вывод повторяющихся символов
 for (int i = 0;i<127;i++)
 {
-  if (check_s[i] == 2) 
-  printf("%c ", i);
+  if (check_s[i] == 2)
+  fprintf(f_out,"%c ", i);
 }
-printf("\n");
 
 // close file
 if (f_in != NULL) fclose(f_in);
