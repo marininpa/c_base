@@ -1,33 +1,46 @@
 #ifndef TEMP_API_H
 #define TEMP_API_H
+
 #include <stdint.h>
 
-// Структура для хранения данных о температуре
+#define INITIAL_CAPACITY 10
+
+// Исходная структура данных
 typedef struct {
-    uint16_t year;   // dddd
-    uint8_t month;   // mm
-    uint8_t day;     // dd
-    uint8_t hour;    // hh
-    uint8_t minute;  // mm
-    int8_t temperature; // -tt..+tt
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    int8_t temperature;
 } TemperatureRecord;
 
-// Среднемесячная температура
-float get_month_avg(const TemperatureRecord* records, int size, int year, int month);
+// для динамического массива
+typedef struct {
+    TemperatureRecord* data; // Указатель на массив
+    int size;                // Текущее количество элементов
+    int capacity;            // Зарезервированная память (емкость)
+} TempArray;
 
-// Минимальная температура в текущем месяце
-int get_month_min(const TemperatureRecord* records, int size, int year, int month);
+// --- Функции работы с массивом ---
+void init_array(TempArray* arr, int initial_capacity);
+void free_array(TempArray* arr);
+int add_record(TempArray* arr, TemperatureRecord rec);
+void delete_record(TempArray* arr, int index);
+void sort_array(TempArray* arr);
+void print_array(const TempArray* arr);
+int load_from_csv(TempArray* arr, const char* filename);
 
-// Максимальная температура в текущем месяце
-int get_month_max(const TemperatureRecord* records, int size, int year, int month);
+// --- Функции статистики ---
+float get_month_avg(const TempArray* arr, int year, int month);
+int get_month_min(const TempArray* arr, int year, int month);
+int get_month_max(const TempArray* arr, int year, int month);
 
-// Среднегодовая температура
-float get_year_avg(const TemperatureRecord* records, int size, int year);
+float get_year_avg(const TempArray* arr, int year);
+int get_year_min(const TempArray* arr, int year);
+int get_year_max(const TempArray* arr, int year);
 
-// Минимальная температура за год
-int get_year_min(const TemperatureRecord* records, int size, int year);
-
-// Максимальная температура за год
-int get_year_max(const TemperatureRecord* records, int size, int year);
+// Вспомогательная функция для получения уникальных лет в массиве
+void get_unique_years(const TempArray* arr, int* years, int* count);
 
 #endif // TEMP_API_H

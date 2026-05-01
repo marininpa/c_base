@@ -1,34 +1,100 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h> 
 #include "temp_api.h"
 
-int main() {
-    // Создаем массив из структур
-    TemperatureRecord data[] = {
-        {2023, 1, 5, 12, 30, -10},
-        {2023, 1, 15, 14, 00, -15},
-        {2023, 2, 10, 10, 15, -5},
-        {2023, 2, 20, 11, 20, 0},
-        {2023, 7, 1, 9, 0, 25},
-        {2023, 7, 15, 15, 45, 30},
-        {2023, 12, 31, 23, 59, -20},
-        {2024, 1, 10, 8, 0, -8}
-    };
+void print_help(const char* program_name) {
+    printf("Использование: %s [-h] [-f файл.csv] [-m месяц]\n", program_name);
+    printf("Функционал:\n");
+    printf("  Чтение данных о температуре из CSV файла.\n");
+    printf("  Вывод статистики (средняя, мин, макс) за каждый месяц или за конкретный месяц.\n");
+    printf("Ключи:\n");
+    printf("  -h  Показать эту справку и выйти.\n");
+    printf("  -f  Указать входной CSV файл для обработки.\n");
+    printf("  -m  Указать номер месяца (1-12) для вывода статистики ТОЛЬКО за этот месяц.\n");
+    printf("      Если ключ -m не задан, выводится статистика за все месяцы по очереди.\n");
+}
 
-    // Вычисляем количество элементов в массиве
-    int data_size = sizeof(data) / sizeof(data[0]);
+int main(int argc, char* argv[]) {
+    char* filename = NULL;
+    int target_month = 0; // 0 означает, что месяц не задан
 
-    int target_year = 2023;
-    int target_month = 1;
+    // Парсинг аргументов командной строки
+    int opt;
+    while ((opt = getopt(argc, argv, "hf:m:")) != -1) {
+        switch (opt) {
+            case 'h':
+                print_help(argv[0]);
+                return 0;
+            case 'f':
+                filename = optarg;
+                break;
+            case 'm':
+                target_month = atoi(optarg);
+                if (target_month < 1 || target_month > 12) {
+                    fprintf(stderr, "Ошибка: Номер месяца должен быть от 1 до 12.\n");
+                    return 1;
+                }
+                break;
+            default:
+                print_help(argv[0]);
+                return 1;
+        }
+    }
 
-    printf("=== Статистика за %d год ===\n", target_year);
-    printf("Среднегодовая температура: %.1f\n", get_year_avg(data, data_size, target_year));
-    printf("Минимальная температура за год: %d\n", get_year_min(data, data_size, target_year));
-    printf("Максимальная температура за год: %d\n", get_year_max(data, data_size, target_year));
+    if (!filename) {
+        fprintf(stderr, "Ошибка: Не указан входной файл. Используйте ключ -f.\n\n");
+        print_help(argv[0]);
+        return 1;
+    }
 
-    printf("\n=== Статистика за %02d.%d ===\n", target_month, target_year);
-    printf("Среднемесячная температура: %.1f\n", get_month_avg(data, data_size, target_year, target_month));
-    printf("Минимальная температура в месяце: %d\n", get_month_min(data, data_size, target_year, target_month));
-    printf("Максимальная температура в месяце: %d\n", get_month_max(data, data_size, target_year, target_month));
+    // Инициализация и загрузка данных
+    TempArray arr;
+    init_array(&arr, INITIAL_CAPACITY);
+    
+    if (!load_from_csv(&arr, filename)) {
+        free_array(&arr);
+        return 1;
+    }
+
+    sort_array(&arr);
+    printf("Загружено записей: %d\n\n", arr.size);
+
+    // Получаем список уникальных лет
+    int years[100];
+    int year_count = 0;
+    get_unique_years(&arr, years, &year_count);
+
+    // Вывод статистики
+    for (int i = 0; i < year_count; i++) {
+        int y = years[i];
+        
+        if (target_month != 0) {
+            // Ключ -m УКАЗАН: выводим статистику только для одного месяца
+            printf("=== Статистика за %02d.%d ===\n", target_month, y);
+            printf("Средняя температура: %.1f\n", get_month_avg(&arr, y, target_month));
+            printf("Минимальная: %d\n", get_month_min(&arr, y, target_month));
+            printf("Максимальная: %d\n\n", get_month_max(&arr, y, target_month));
+        } else {
+            // Ключ -m НЕ УКАЗАН: выводим статистику за ВСЕ 12 месяцев
+            printf("========== Статистика за %d год ==========\n", y);
+            for (int m = 1; m <= 12; m++) {
+                // Если в файле нет данных за какой-то месяц, функции вернут 0
+                printf("--- Месяц: %02d ---\n", m);
+                printf("  Средняя: %.1f\n", get_month_avg(&arr, y, m));
+                printf("  Мин: %d\n", get_month_min(&arr, y, m));
+                printf("  Макс: %d\n\n", get_month_max(&arr, y, m));
+            }
+        }
+        // Выводим статистику за весь год
+        printf("=== Статистика за %d год ===\n", y);
+        printf("Среднегодовая температура: %.1f\n", get_year_avg(&arr, y));
+        printf("Минимальная за год: %d\n", get_year_min(&arr, y));
+        printf("Максимальная за год: %d\n\n", get_year_max(&arr, y));
+    }
+
+    // Очистка памяти
+    free_array(&arr);
 
     return 0;
 }
