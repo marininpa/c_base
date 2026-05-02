@@ -66,29 +66,38 @@ int main(int argc, char* argv[]) {
     get_unique_years(&arr, years, &year_count);
 
     // Вывод статистики
+    printf("\n| Year | Month |   Avg |   Max |   Min |\n");
+    printf("|------|-------|-------|-------|-------|\n");
     for (int i = 0; i < year_count; i++) {
         int y = years[i];
         
         if (target_month != 0) {
             // Ключ -m УКАЗАН: выводим статистику только для одного месяца
-            printf("# Year Month MonthAvg MonthMax MonthMin \n");
-            printf("- %4d  %02d    %.1f      %d     s  %d\n", y, target_month, get_month_avg(&arr, y, target_month), get_month_max(&arr, y, target_month), get_month_min(&arr, y, target_month));
-        } else {
+            printf("| %4d | %5d | %5.1f | %5d | %5d |\n",
+                   y, target_month,
+                   get_month_avg(&arr, y, target_month),
+                   get_month_max(&arr, y, target_month),
+                   get_month_min(&arr, y, target_month));
+            } else {
             // Ключ -m НЕ УКАЗАН: выводим статистику за ВСЕ 12 месяцев
-            printf("========== Статистика за %d год ==========\n", y);
-            for (int m = 1; m <= 12; m++) {
+              for (int m = 1; m <= 12; m++) {
                 // Если в файле нет данных за какой-то месяц, функции вернут 0
-                printf("--- Месяц: %02d ---\n", m);
-                printf("  Средняя: %.1f\n", get_month_avg(&arr, y, m));
-                printf("  Мин: %d\n", get_month_min(&arr, y, m));
-                printf("  Макс: %d\n\n", get_month_max(&arr, y, m));
+                printf("| %4d | %5d | %5.1f | %5d | %5d |\n",
+                       y, m,
+                       get_month_avg(&arr, y, m),
+                       get_month_max(&arr, y, m),
+                       get_month_min(&arr, y, m));
+
+              }
+            printf("|------|-------|-------|-------|-------|\n");
+            printf("| %4d | TOTAL | %5.1f | %5d | %5d |\n",
+                   y,
+                   get_year_avg(&arr, y),
+                   get_year_max(&arr, y),
+                   get_year_min(&arr, y));
+            printf("|------|-------|-------|-------|-------|\n");
+            // Выводим статистику за весь год
             }
-        }
-        // Выводим статистику за весь год
-        printf("=== Статистика за %d год ===\n", y);
-        printf("Среднегодовая температура: %.1f\n", get_year_avg(&arr, y));
-        printf("Минимальная за год: %d\n", get_year_min(&arr, y));
-        printf("Максимальная за год: %d\n\n", get_year_max(&arr, y));
     }
 
     // Очистка памяти
