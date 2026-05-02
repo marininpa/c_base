@@ -3,7 +3,6 @@
 #include <string.h>
 #include "temp_api.h"
 
-#define INITIAL_CAPACITY 10
 
 // --- Работа с динамическим массивом ---
 
@@ -77,24 +76,77 @@ int load_from_csv(TempArray* arr, const char* filename) {
         return 0;
     }
 
-    char line[128];
-    // Пропускаем заголовок (если он есть)
-    if (fgets(line, sizeof(line), file)) {
-        if (strncmp(line, "year", 4) != 0) {
-            rewind(file); // Если заголовка нет, возвращаемся в начало
-        }
-    }
+    char line[256]; // Буфер
+    int line_number = 0;
+    int error_count = 0;
 
-    int y, m, d, h, mi, t;
     while (fgets(line, sizeof(line), file)) {
-        if (sscanf(line, "%d;%d;%d;%d;%d;%d", &y, &m, &d, &h, &mi, &t) == 6) {
-            TemperatureRecord rec = {y, m, d, h, mi, t};
-            if (m >= 1 && m <= 12 && t >= -99 && t <= 99) {
-                add_record(arr, rec);
+        line_number++;
+
+        // Пропуск пустых строк
+        if (line[0] == '\n' || line[0] == '\r' || line[0] == '\0') {
+            continue;
+        }
+
+        // Если это первая строка и она не начинается с цифры
+        if (line_number == 1) {
+            int test_val;
+            if (sscanf(line, "%d", &test_val) != 1) {
+                continue; // Это заголовок, пропускаем
             }
         }
+
+        int y, m, d, h, mi, t;
+        
+        // Проверка кол-ва элементов в строке
+        if (sscanf(line, "%d;%d;%d;%d;%d;%d", &y, &m, &d, &h, &mi, &t) != 6) {
+            fprintf(stderr, "[ОШИБКА] Строка %d: неверный формат или неверный разделитель.\n", line_number);
+            error_count++;
+            continue; // Прерываем обработку только этой строки и идем к следующей
+        }
+
+        // Проверка формата данных
+        int is_valid = 1;
+        
+        if (y < 1000 || y > 9999) {
+            fprintf(stderr, "[ОШИБКА] Строка %d: год должен быть 4-значным (%d).\n", line_number, y);
+            is_valid = 0;
+        } else if (m < 1 || m > 12) {
+            fprintf(stderr, "[ОШИБКА] Строка %d: месяц вне диапазона 1-12 (%d).\n", line_number, m);
+            is_valid = 0;
+        } else if (d < 1 || d > 31) {
+            fprintf(stderr, "[ОШИБКА] Строка %d: день вне диапазона 1-31 (%d).\n", line_number, d);
+            is_valid = 0;
+        } else if (h < 0 || h > 23) {
+            fprintf(stderr, "[ОШИБКА] Строка %d: часы вне диапазона 0-23 (%d).\n", line_number, h);
+            is_valid = 0;
+        } else if (mi < 0 || mi > 59) {
+            fprintf(stderr, "[ОШИБКА] Строка %d: минуты вне диапазона 0-59 (%d).\n", line_number, mi);
+            is_valid = 0;
+        } else if (t < -99 || t > 99) {
+            fprintf(stderr, "[ОШИБКА] Строка %d: температура вне диапазона -99..99 (%d).\n", line_number, t);
+            is_valid = 0;
+        }
+
+        if (!is_valid) {
+            error_count++;
+            continue; // Идем к следующей строке
+        }
+
+        // Если все проверки пройдены, добавляем запись в массив
+        TemperatureRecord rec = {y, m, d, h, mi, t};
+        add_record(arr, rec);
     }
+
     fclose(file);
+
+    // Итоговое сообщение об импорте (выводим в stderr, чтобы не мешать основному выводу программы)
+    if (error_count > 0) {
+        fprintf(stderr, "\n[ИМПОРТ] Завершен с ошибками. Успешно загружено: %d, Пропущено из-за ошибок: %d\n", arr->size, error_count);
+    } else {
+        fprintf(stderr, "\n[ИМПОРТ] Успешно завершен. Загружено записей: %d\n", arr->size);
+    }
+
     return 1;
 }
 
