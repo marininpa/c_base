@@ -71,10 +71,8 @@ int main(int argc, char* argv[]) {
         
         if (target_month != 0) {
             // Ключ -m УКАЗАН: выводим статистику только для одного месяца
-            printf("=== Статистика за %02d.%d ===\n", target_month, y);
-            printf("Средняя температура: %.1f\n", get_month_avg(&arr, y, target_month));
-            printf("Минимальная: %d\n", get_month_min(&arr, y, target_month));
-            printf("Максимальная: %d\n\n", get_month_max(&arr, y, target_month));
+            printf("# Year Month MonthAvg MonthMax MonthMin \n");
+            printf("- %4d  %02d    %.1f      %d     s  %d\n", y, target_month, get_month_avg(&arr, y, target_month), get_month_max(&arr, y, target_month), get_month_min(&arr, y, target_month));
         } else {
             // Ключ -m НЕ УКАЗАН: выводим статистику за ВСЕ 12 месяцев
             printf("========== Статистика за %d год ==========\n", y);
