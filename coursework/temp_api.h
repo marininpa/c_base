@@ -22,6 +22,9 @@ typedef struct {
     int capacity;            // Зарезервированная память (емкость)
 } TempArray;
 
+// Функция вывода справки
+void print_help(const char* program_name);
+
 // --- Функции работы с массивом ---
 void init_array(TempArray* arr, int initial_capacity);
 void free_array(TempArray* arr);

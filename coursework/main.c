@@ -3,17 +3,6 @@
 #include <unistd.h> 
 #include "temp_api.h"
 
-void print_help(const char* program_name) {
-    printf("Использование: %s [-h] [-f файл.csv] [-m месяц]\n", program_name);
-    printf("Функционал:\n");
-    printf("  Чтение данных о температуре из CSV файла.\n");
-    printf("  Вывод статистики (средняя, мин, макс) за каждый месяц или за конкретный месяц.\n");
-    printf("Ключи:\n");
-    printf("  -h  Показать эту справку и выйти.\n");
-    printf("  -f  Указать входной CSV файл для обработки.\n");
-    printf("  -m  Указать номер месяца (1-12) для вывода статистики ТОЛЬКО за этот месяц.\n");
-    printf("      Если ключ -m не задан, выводится статистика за все месяцы по очереди.\n");
-}
 
 int main(int argc, char* argv[]) {
     char* filename = NULL;
